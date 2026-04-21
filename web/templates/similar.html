@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoEstima — Cotxes similars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/similar.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">🌙</span>
+        <span id="toggle-label">Mode fosc</span>
+    </button>
+
+    <div class="container">
+
+        <header class="similar-header">
+            <a href="/" class="btn-back">← Tornar</a>
+            <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
+        </header>
+
+        <div class="similar-summary">
+            <div class="summary-info">
+                <h2>Cotxes similars trobats</h2>
+                <p>
+                    <strong>{{ make | title }}</strong> ·
+                    <strong>{{ fuel | title }}</strong> ·
+                    Preu estimat <strong>{{ "{:,}".format(predicted).replace(",", ".") }} €</strong>
+                </p>
+            </div>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <span class="summary-stat-num">{{ count }}</span>
+                    <span class="summary-stat-lbl">cotxes trobats</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-stat-num">{{ "{:,}".format(price_low).replace(",", ".") }}€</span>
+                    <span class="summary-stat-lbl">preu mínim rang</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-stat-num">{{ "{:,}".format(price_high).replace(",", ".") }}€</span>
+                    <span class="summary-stat-lbl">preu màxim rang</span>
+                </div>
+            </div>
+        </div>
+
+        {% if cars %}
+        <div class="cars-grid" id="cars-grid">
+            {% for car in cars %}
+            <div class="car-card" data-make="{{ car.make }}" data-model="{{ car.model }}">
+                <div class="car-thumb" id="thumb-{{ loop.index }}">
+                    <div class="car-img-loading">
+                        <div class="img-spinner"></div>
+                    </div>
+                    <div class="car-fuel-badge">{{ car.fuel_type | title }}</div>
+                </div>
+                <div class="car-body">
+                    <div class="car-title">{{ car.make | title }} {{ car.model | title }}</div>
+                    <div class="car-price">{{ "{:,}".format(car.price | int).replace(",", ".") }} €</div>
+                    <div class="car-specs">
+                        <div class="car-spec">
+                            <span class="spec-icon">🛣️</span>
+                            <span>{{ "{:,}".format(car.kms | int).replace(",", ".") }} km</span>
+                        </div>
+                        <div class="car-spec">
+                            <span class="spec-icon">⚡</span>
+                            <span>{{ car.power | int }} CV</span>
+                        </div>
+                        <div class="car-spec">
+                            <span class="spec-icon">📅</span>
+                            <span>{{ car.months_old | int }} mesos</span>
+                        </div>
+                        <div class="car-spec">
+                            <span class="spec-icon">🔧</span>
+                            <span>{{ car.gear_type | title }}</span>
+                        </div>
+                    </div>
+                    <div class="car-footer">
+                        <span class="car-sale-type">{{ car.sale_type | replace('_', ' ') | title }}</span>
+                        <span class="car-owners">{{ car.num_owners | int }} propietari{% if car.num_owners > 1 %}s{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No hem trobat cotxes similars</h3>
+            <p>Prova amb una altra marca o ampliant el rang de preu.</p>
+            <a href="/" class="btn-predict" style="display:inline-flex; width:auto; padding: 14px 28px;">Tornar a cercar</a>
+        </div>
+        {% endif %}
+
+        <footer class="footer">
+            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
+        </footer>
+    </div>
+
+    <script src="/static/main.js"></script>
+    <script src="/static/images.js"></script>
+</body>
+</html>

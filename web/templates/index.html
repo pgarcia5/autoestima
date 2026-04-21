@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoEstima — Predicció de preus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Theme toggle -->
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">🌙</span>
+        <span id="toggle-label">Mode fosc</span>
+    </button>
+
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
+            <p class="tagline">Descobreix el valor real del teu vehicle amb Intel·ligència Artificial</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-num">82k</div>
+                <div class="stat-lbl">vehicles analitzats</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">0.901</div>
+                <div class="stat-lbl">R² del model</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">±2.183€</div>
+                <div class="stat-lbl">error mitjà (MAE)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">10+</div>
+                <div class="stat-lbl">variables analitzades</div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <main class="card">
+            <div class="card-header">
+                <h2>Calcula el preu estimat <span class="badge">Random Forest</span></h2>
+                <p>Introdueix les característiques del vehicle per obtenir una estimació precisa del seu valor de mercat</p>
+            </div>
+
+            <!-- Selector de vehicle -->
+            <div class="vehicle-selector">
+                <button class="vehicle-btn active" id="btn-car" onclick="selectVehicle('car')">
+                    🚗 Cotxe
+                </button>
+                <button class="vehicle-btn" id="btn-moto" onclick="selectVehicle('moto')">
+                    🏍️ Moto
+                </button>
+            </div>
+
+            <!-- Formulari cotxe -->
+            <form id="predict-form" class="form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="make">Marca</label>
+                        <select id="make" name="make" required>
+                            <option value="" disabled selected>Selecciona la marca</option>
+                            {% for make in makes %}
+                            <option value="{{ make }}">{{ make | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fuel_type">Combustible</label>
+                        <select id="fuel_type" name="fuel_type" required>
+                            <option value="" disabled selected>Selecciona el combustible</option>
+                            {% for fuel in fuel_types %}
+                            <option value="{{ fuel }}">{{ fuel | capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gear_type">Tipus de canvi</label>
+                        <select id="gear_type" name="gear_type" required>
+                            <option value="" disabled selected>Selecciona el canvi</option>
+                            {% for gear in gear_types %}
+                            <option value="{{ gear }}">{{ gear | capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sale_type">Estat del vehicle</label>
+                        <select id="sale_type" name="sale_type" required>
+                            <option value="" disabled selected>Selecciona l'estat</option>
+                            {% for sale in sale_types %}
+                            <option value="{{ sale }}">{{ sale | replace('_', ' ') | capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="months_old">Antiguitat (mesos)</label>
+                        <input type="number" id="months_old" name="months_old" placeholder="Ex: 36" min="0" max="600" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="power">Potència (CV)</label>
+                        <input type="number" id="power" name="power" placeholder="Ex: 120" min="50" max="1000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kms">Quilometratge (km)</label>
+                        <input type="number" id="kms" name="kms" placeholder="Ex: 85000" min="0" max="600000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="num_owners">Nombre de propietaris</label>
+                        <input type="number" id="num_owners" name="num_owners" placeholder="Ex: 1" min="1" max="10" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-predict" id="submit-btn">
+                    <span class="btn-text">Calcular preu estimat</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <!-- Missatge motos -->
+            <div class="moto-msg" id="moto-msg">
+                <div class="moto-msg-icon">🏍️</div>
+                <h3 class="moto-msg-title">Predicció de motos pròximament</h3>
+                <p class="moto-msg-text">
+                    El nostre model de Machine Learning està entrenat exclusivament amb dades de cotxes de segona mà.
+                    Estem treballant en un model específic per a motos.
+                </p>
+                <p class="moto-msg-text">
+                    Mentrestant, pots consultar la nostra selecció de <strong>motos destacades</strong> amb preus reals del mercat espanyol.
+                </p>
+                <a href="#motos" class="btn-predict btn-moto-link">
+                    <span>Veure motos destacades</span>
+                    <span>↓</span>
+                </a>
+            </div>
+
+        </main>
+
+        <!-- Result -->
+        <div class="result-card" id="result-card">
+            <div class="result-label">Preu estimat</div>
+            <div class="result-price" id="result-price">—</div>
+            <div class="result-range">
+                <span class="range-label">Rang de confiança</span>
+                <span class="range-values">
+                    <span id="price-low">—</span>
+                    <span class="range-sep">→</span>
+                    <span id="price-high">—</span>
+                </span>
+            </div>
+            <div class="result-note">Basat en un model Random Forest entrenat amb 82.372 vehicles · R² = 0.901 · MAE = ±2.183€</div>
+            <a href="#" class="btn-similar" id="btn-similar">
+                <span>Veure cotxes similars al dataset</span>
+                <span>→</span>
+            </a>
+        </div>
+
+        <!-- Error -->
+        <div class="error-card" id="error-card">
+            <p id="error-msg"></p>
+        </div>
+
+        <!-- Cerca per pressupost -->
+        <section class="section">
+            <h3 class="section-title">💰 Cerca per <span class="accent">pressupost</span></h3>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Què puc comprar amb el meu pressupost?</h2>
+                    <p>Introdueix el teu rang de preu i et mostrarem les estadístiques dels vehicles disponibles en aquell rang</p>
+                </div>
+                <form id="budget-form" class="form">
+                    <div class="budget-grid">
+                        <div class="form-group">
+                            <label for="price_min">Preu mínim (€)</label>
+                            <input type="number" id="price_min" name="price_min" placeholder="Ex: 7000" min="500" max="200000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price_max">Preu màxim (€)</label>
+                            <input type="number" id="price_max" name="price_max" placeholder="Ex: 9000" min="500" max="200000" required>
+                        </div>
+                        <button type="submit" class="btn-predict btn-budget" id="budget-btn">
+                            <span class="btn-text">Cercar vehicles</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Budget Result -->
+            <div class="budget-result" id="budget-result">
+                <div class="budget-header">
+                    <div class="budget-count">
+                        <span id="budget-count">—</span>
+                        <span class="budget-count-label">vehicles trobats</span>
+                    </div>
+                    <div class="budget-avg-price">Preu mitjà: <strong id="budget-avg-price">—</strong></div>
+                </div>
+                <div class="budget-stats">
+                    <div class="budget-stat">
+                        <div class="budget-stat-icon">🛣️</div>
+                        <div class="budget-stat-val" id="budget-kms">—</div>
+                        <div class="budget-stat-lbl">km mitjans</div>
+                    </div>
+                    <div class="budget-stat">
+                        <div class="budget-stat-icon">📅</div>
+                        <div class="budget-stat-val" id="budget-months">—</div>
+                        <div class="budget-stat-lbl">mesos d'antiguitat</div>
+                    </div>
+                    <div class="budget-stat">
+                        <div class="budget-stat-icon">⚡</div>
+                        <div class="budget-stat-val" id="budget-power">—</div>
+                        <div class="budget-stat-lbl">CV de potència</div>
+                    </div>
+                </div>
+                <div class="budget-lists">
+                    <div class="budget-list-block">
+                        <div class="budget-list-title">🏆 Marques més freqüents</div>
+                        <div id="budget-makes" class="budget-tags"></div>
+                    </div>
+                    <div class="budget-list-block">
+                        <div class="budget-list-title">⛽ Combustibles</div>
+                        <div id="budget-fuels" class="budget-tags"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-card" id="budget-error">
+                <p id="budget-error-msg"></p>
+            </div>
+        </section>
+
+        <!-- Motos destacades -->
+        <section class="section" id="motos">
+            <h3 class="section-title">🏍️ Motos de segona mà <span class="accent">destacades</span></h3>
+            <div class="motos-grid">
+                {% for moto in motos %}
+                <div class="moto-card" data-make="{{ moto.make }}" data-model="{{ moto.model }}">
+                    <div class="moto-thumb">
+                        <div class="car-img-loading"><div class="img-spinner"></div></div>
+                        <span class="moto-type-badge">{{ moto.type }}</span>
+                    </div>
+                    <div class="moto-body">
+                        <div class="moto-title">{{ moto.make }} {{ moto.model }}</div>
+                        <div class="moto-price">{{ "{:,}".format(moto.price).replace(",", ".") }} €</div>
+                        <div class="moto-specs">
+                            <div class="moto-spec">📅 {{ moto.year }}</div>
+                            <div class="moto-spec">🛣️ {{ "{:,}".format(moto.kms).replace(",", ".") }} km</div>
+                            <div class="moto-spec">⚙️ {{ moto.engine }} cc</div>
+                            <div class="moto-spec">⚡ {{ moto.power }} CV</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <p class="motos-note">* Preus orientatius basats en el mercat espanyol de motos de segona mà (Motos.net, 2024)</p>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">⭐ Nous cotxes <span class="accent">2026</span></h3>
+            <div class="vehicles-grid">
+                {% for car in new_cars %}
+                <div class="vehicle-card">
+                    <div class="vehicle-thumb">{{ car.icon }}</div>
+                    <div class="vehicle-body">
+                        <div class="vehicle-name">{{ car.name }}</div>
+                        <div class="vehicle-meta">
+                            <span class="vehicle-cat">{{ car.category }}</span>
+                            <span class="vehicle-year">{{ car.year }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Notícies -->
+        <section class="section">
+            <h3 class="section-title">📰 Últimes <span class="accent">notícies</span></h3>
+            <div class="news-grid">
+                {% for item in news %}
+                <div class="news-card news-{{ item.color }}">
+                    <div class="news-thumb">
+                        <span class="news-icon">{{ item.icon }}</span>
+                        <span class="news-cat-badge">{{ item.category }}</span>
+                    </div>
+                    <div class="news-body">
+                        <div class="news-title">{{ item.title }}</div>
+                        <div class="news-desc">{{ item.desc }}</div>
+                        <div class="news-date">{{ item.date }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
+        </footer>
+
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>
