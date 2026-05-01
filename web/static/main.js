@@ -1,3 +1,63 @@
+// ── Modal motos ───────────────────────────────────────────
+function obrirModal(nom, preu, urlMotosnet, urlMilanuncios, urlWallapop) {
+    document.getElementById('modal-icon').textContent = '🏍️';
+    document.getElementById('modal-title').textContent = nom;
+    document.getElementById('modal-price').textContent = 'Preu orientatiu: ' + preu.replace(',', '.') + ' €';
+    document.getElementById('modal-desc').textContent = 'Cerca aquesta moto a les principals plataformes de venda de segona mà a Espanya:';
+
+    const lnkCoches = document.getElementById('link-coches');
+    lnkCoches.href = urlMotosnet;
+    document.getElementById('link-coches-name').textContent = 'Motos.net';
+    document.getElementById('link-coches-desc').textContent = 'El portal líder de motos a Espanya';
+    lnkCoches.querySelector('.modal-link-icon').textContent = '🏍️';
+
+    document.getElementById('link-milanuncios').href = urlMilanuncios;
+    document.getElementById('link-wallapop').href = urlWallapop;
+
+    // AutoScout24 per motos
+    const queryAS = nom.replace(/ /g, '+');
+    document.getElementById('link-autoscout').href = `https://www.autoscout24.es/lst?q=${queryAS}&vehc=M`;
+
+    document.getElementById('modal-overlay').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+
+function obrirModalBudget() {
+    const pMin = document.getElementById('price_min').value;
+    const pMax = document.getElementById('price_max').value;
+    if (!pMin || !pMax) return;
+
+    document.getElementById('modal-icon').textContent = '🚗';
+    document.getElementById('modal-title').textContent = 'Cotxes entre ' + parseInt(pMin).toLocaleString('ca') + ' € i ' + parseInt(pMax).toLocaleString('ca') + ' €';
+    document.getElementById('modal-price').textContent = 'Rang de preu aplicat als resultats de cerca';
+    document.getElementById('modal-desc').textContent = 'Cerca cotxes en aquest rang de preu a les principals plataformes:';
+
+    const lnkCoches = document.getElementById('link-coches');
+    lnkCoches.href = `https://www.coches.net/segunda-mano/?precioDesde=${pMin}&precioHasta=${pMax}`;
+    document.getElementById('link-coches-name').textContent = 'Coches.net';
+    document.getElementById('link-coches-desc').textContent = 'El portal líder de cotxes a Espanya';
+    lnkCoches.querySelector('.modal-link-icon').textContent = '🚗';
+
+    document.getElementById('link-milanuncios').href =
+        `https://www.milanuncios.com/coches-de-segunda-mano/?preciodesde=${pMin}&preciohasta=${pMax}`;
+    document.getElementById('link-wallapop').href =
+        `https://es.wallapop.com/app/search?keywords=cotxe&category_ids=100&min_sale_price=${pMin}&max_sale_price=${pMax}`;
+    document.getElementById('link-autoscout').href =
+        `https://www.autoscout24.es/lst?atype=C&pricefrom=${pMin}&priceto=${pMax}`;
+
+    document.getElementById('modal-overlay').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+
+function tancarModal() {
+    document.getElementById('modal-overlay').classList.remove('visible');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') tancarModal();
+});
+
 // ── Vehicle selector ──────────────────────────────────────
 function selectVehicle(type) {
     const form = document.getElementById('predict-form');
@@ -42,7 +102,9 @@ btn.addEventListener('click', () => {
 });
 
 // ── Budget form ───────────────────────────────────────────
-document.getElementById('budget-form').addEventListener('submit', async (e) => {
+const budgetForm = document.getElementById('budget-form');
+if (budgetForm) {
+    budgetForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const btn = document.getElementById('budget-btn');
@@ -91,7 +153,11 @@ document.getElementById('budget-form').addEventListener('submit', async (e) => {
         btnText.textContent = 'Cercar vehicles';
     }
 });
-document.getElementById('predict-form').addEventListener('submit', async (e) => {
+}
+
+const predictForm = document.getElementById('predict-form');
+if (predictForm) {
+    predictForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const submitBtn = document.getElementById('submit-btn');
@@ -140,3 +206,4 @@ document.getElementById('predict-form').addEventListener('submit', async (e) => 
         btnText.textContent = 'Calcular preu estimat';
     }
 });
+}

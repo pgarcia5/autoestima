@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoEstima — {{ article.title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/article.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">🌙</span>
+        <span id="toggle-label">Mode fosc</span>
+    </button>
+
+    <div class="container">
+        <header class="similar-header">
+            <a href="/" class="btn-back">← Tornar</a>
+            <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
+        </header>
+
+        <article class="article-wrap">
+            <div class="article-meta">
+                <span class="article-cat article-cat-{{ article.color }}">{{ article.category }}</span>
+                <span class="article-date">{{ article.date }}</span>
+            </div>
+            <h1 class="article-title">{{ article.title }}</h1>
+            <div class="article-hero">
+                <img src="{{ article.image }}" alt="{{ article.title }}" class="article-hero-img">
+            </div>
+            <div class="article-body">
+                {% for paragraph in article.body %}
+                {% if paragraph.startswith('##') %}
+                <h2>{{ paragraph[2:].strip() }}</h2>
+                {% else %}
+                <p>{{ paragraph }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </article>
+
+        <footer class="footer">
+            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
+        </footer>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

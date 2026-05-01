@@ -163,12 +163,69 @@ body.light .vehicle-btn.active { border-color: #e8440a; }
 .moto-msg-text strong { color: var(--text); }
 .btn-moto-link { display: inline-flex; width: auto; margin-top: 20px; padding: 13px 28px; text-decoration: none; }
 
+.modal-link-4:hover { border-color: #10b981; }
+.btn-on-trobar-budget { margin-top: 20px; font-size: 0.88rem; padding: 12px; }
+
+/* Botó on trobar */
+.btn-on-trobar {
+    width: 100%; margin-top: 12px; padding: 9px; border-radius: 8px; cursor: pointer;
+    font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+    border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+    transition: background 0.2s, color 0.2s;
+}
+.btn-on-trobar:hover { background: var(--accent); color: #0a0a0a; }
+body.light .btn-on-trobar { border-color: #e8440a; color: #e8440a; }
+body.light .btn-on-trobar:hover { background: #e8440a; color: #fff; }
+
+/* Modal */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    backdrop-filter: blur(4px);
+}
+.modal-overlay.visible { display: flex; animation: fadeIn 0.2s ease; }
+.modal-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; max-width: 480px; width: 100%; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-close {
+    position: absolute; top: 14px; right: 16px; background: none; border: none;
+    font-size: 1.1rem; color: var(--muted); cursor: pointer; padding: 4px 8px;
+    border-radius: 6px; transition: color 0.2s;
+}
+.modal-close:hover { color: var(--text); }
+.modal-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.modal-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+.modal-price { font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
+body.light .modal-price { color: #e8440a; }
+.modal-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
+.modal-links { display: flex; flex-direction: column; gap: 10px; }
+.modal-link {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    border: 1px solid var(--border); background: var(--surface2);
+    transition: border-color 0.2s, transform 0.15s;
+}
+.modal-link:hover { transform: translateX(4px); }
+.modal-link-1:hover { border-color: #e8440a; }
+.modal-link-2:hover { border-color: #f59e0b; }
+.modal-link-3:hover { border-color: #3b82f6; }
+.modal-link-icon { font-size: 1.4rem; flex-shrink: 0; }
+.modal-link-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+.modal-link-desc { font-size: 0.75rem; color: var(--muted); }
+.modal-link-arrow { margin-left: auto; color: var(--muted); font-size: 1rem; flex-shrink: 0; }
+
 /* Motos */
 .motos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
 .moto-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; box-shadow: var(--shadow); }
 .moto-card:hover { border-color: rgba(232,255,71,0.3); transform: translateY(-2px); }
 body.light .moto-card:hover { border-color: rgba(232,68,10,0.3); }
 .moto-thumb { height: 120px; background: var(--surface2); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.moto-img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+.moto-card:hover .moto-img { transform: scale(1.05); }
 .moto-type-badge { position: absolute; top: 8px; right: 8px; background: rgba(232,255,71,0.12); color: #b8cc20; font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
 body.light .moto-type-badge { background: rgba(232,68,10,0.1); color: #e8440a; }
 .moto-body { padding: 14px; }
@@ -183,10 +240,11 @@ body.light .moto-price { color: #e8440a; }
 
 /* Vehicles */
 .vehicles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.vehicle-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; box-shadow: var(--shadow); }
+.vehicle-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; box-shadow: var(--shadow); text-decoration: none; color: var(--text); display: block; cursor: pointer; }
 .vehicle-card:hover { border-color: rgba(232,255,71,0.3); transform: translateY(-2px); }
 body.light .vehicle-card:hover { border-color: rgba(232,68,10,0.3); }
-.vehicle-thumb { height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--surface2); }
+.vehicle-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--surface2); overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; }
+.vehicle-thumb .car-img { width: 100%; height: 100%; object-fit: cover; }
 .vehicle-body { padding: 12px; }
 .vehicle-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; }
 .vehicle-meta { display: flex; justify-content: space-between; }
@@ -196,7 +254,7 @@ body.light .vehicle-year { color: #e8440a; }
 
 /* News */
 .news-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.news-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; box-shadow: var(--shadow); }
+.news-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; box-shadow: var(--shadow); text-decoration: none; display: block; color: var(--text); }
 .news-card:hover { border-color: rgba(232,255,71,0.25); transform: translateY(-2px); }
 body.light .news-card:hover { border-color: rgba(232,68,10,0.25); }
 .news-thumb { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
@@ -208,6 +266,7 @@ body.light .news-card.news-green .news-thumb { background: linear-gradient(135de
 body.light .news-card.news-blue .news-thumb { background: linear-gradient(135deg, #e8f0f8, #d4e4f0); }
 body.light .news-card.news-orange .news-thumb { background: linear-gradient(135deg, #fdf0e8, #f5e4d4); }
 body.light .news-card.news-purple .news-thumb { background: linear-gradient(135deg, #f0e8f8, #e4d4f0); }
+.news-img { width: 100%; height: 100%; object-fit: cover; }
 .news-icon { font-size: 2rem; }
 .news-cat-badge { position: absolute; top: 8px; left: 8px; background: rgba(232,255,71,0.12); color: #b8cc20; font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; font-weight: 500; }
 body.light .news-cat-badge { background: rgba(232,68,10,0.1); color: #e8440a; }

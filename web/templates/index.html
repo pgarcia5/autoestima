@@ -231,6 +231,9 @@
                         <div id="budget-fuels" class="budget-tags"></div>
                     </div>
                 </div>
+                <button class="btn-on-trobar btn-on-trobar-budget" id="btn-on-trobar-budget" onclick="obrirModalBudget()">
+                    🔍 On trobar cotxes en aquest rang de preu
+                </button>
             </div>
 
             <div class="error-card" id="budget-error">
@@ -245,7 +248,9 @@
                 {% for moto in motos %}
                 <div class="moto-card" data-make="{{ moto.make }}" data-model="{{ moto.model }}">
                     <div class="moto-thumb">
-                        <div class="car-img-loading"><div class="img-spinner"></div></div>
+                        <img src="{{ moto.img }}" alt="{{ moto.make }} {{ moto.model }}" class="car-img"
+                             onerror="this.style.display='none'; this.parentElement.querySelector('.moto-fallback').style.display='flex'">
+                        <div class="moto-fallback" style="display:none; align-items:center; justify-content:center; height:100%; font-size:2.5rem;">🏍️</div>
                         <span class="moto-type-badge">{{ moto.type }}</span>
                     </div>
                     <div class="moto-body">
@@ -257,6 +262,9 @@
                             <div class="moto-spec">⚙️ {{ moto.engine }} cc</div>
                             <div class="moto-spec">⚡ {{ moto.power }} CV</div>
                         </div>
+                        <button class="btn-on-trobar" onclick="obrirModal('{{ moto.make }} {{ moto.model }}', '{{ moto.price }}', '{{ moto.links.motosnet }}', '{{ moto.links.milanuncios }}', '{{ moto.links.wallapop }}')">
+                            🔍 On trobar-la
+                        </button>
                     </div>
                 </div>
                 {% endfor %}
@@ -268,8 +276,11 @@
             <h3 class="section-title">⭐ Nous cotxes <span class="accent">2026</span></h3>
             <div class="vehicles-grid">
                 {% for car in new_cars %}
-                <div class="vehicle-card">
-                    <div class="vehicle-thumb">{{ car.icon }}</div>
+                <a href="/cotxe/{{ car.id }}" target="_blank" class="vehicle-card">
+                    <div class="vehicle-thumb">
+                        <img src="{{ car.img }}" alt="{{ car.name }}" class="car-img"
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ car.icon }}'">
+                    </div>
                     <div class="vehicle-body">
                         <div class="vehicle-name">{{ car.name }}</div>
                         <div class="vehicle-meta">
@@ -277,7 +288,7 @@
                             <span class="vehicle-year">{{ car.year }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 {% endfor %}
             </div>
         </section>
@@ -287,9 +298,9 @@
             <h3 class="section-title">📰 Últimes <span class="accent">notícies</span></h3>
             <div class="news-grid">
                 {% for item in news %}
-                <div class="news-card news-{{ item.color }}">
+                <a href="/article/{{ item.id }}" target="_blank" class="news-card news-{{ item.color }}">
                     <div class="news-thumb">
-                        <span class="news-icon">{{ item.icon }}</span>
+                        <img src="{{ item.image }}" alt="{{ item.title }}" class="news-img">
                         <span class="news-cat-badge">{{ item.category }}</span>
                     </div>
                     <div class="news-body">
@@ -297,7 +308,7 @@
                         <div class="news-desc">{{ item.desc }}</div>
                         <div class="news-date">{{ item.date }}</div>
                     </div>
-                </div>
+                </a>
                 {% endfor %}
             </div>
         </section>
@@ -309,6 +320,52 @@
 
     </div>
 
-    <script src="/static/main.js"></script>
+    <!-- Modal on trobar (motos i cotxes per pressupost) -->
+    <div class="modal-overlay" id="modal-overlay" onclick="tancarModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="tancarModal()">✕</button>
+            <div class="modal-icon" id="modal-icon">🏍️</div>
+            <h3 class="modal-title" id="modal-title">—</h3>
+            <p class="modal-price" id="modal-price">—</p>
+            <p class="modal-desc" id="modal-desc">Cerca aquesta moto a les principals plataformes de venda de segona mà a Espanya:</p>
+            <div class="modal-links">
+                <a class="modal-link modal-link-1" id="link-coches" href="#" target="_blank" rel="noopener">
+                    <span class="modal-link-icon">🚗</span>
+                    <div>
+                        <div class="modal-link-name" id="link-coches-name">Coches.net</div>
+                        <div class="modal-link-desc" id="link-coches-desc">El portal líder de cotxes i motos a Espanya</div>
+                    </div>
+                    <span class="modal-link-arrow">→</span>
+                </a>
+                <a class="modal-link modal-link-2" id="link-milanuncios" href="#" target="_blank" rel="noopener">
+                    <span class="modal-link-icon">📋</span>
+                    <div>
+                        <div class="modal-link-name">Milanuncios</div>
+                        <div class="modal-link-desc">Milers d'anuncis particulars i professionals</div>
+                    </div>
+                    <span class="modal-link-arrow">→</span>
+                </a>
+                <a class="modal-link modal-link-3" id="link-wallapop" href="#" target="_blank" rel="noopener">
+                    <span class="modal-link-icon">🛍️</span>
+                    <div>
+                        <div class="modal-link-name">Wallapop</div>
+                        <div class="modal-link-desc">Compra i ven entre particulars</div>
+                    </div>
+                    <span class="modal-link-arrow">→</span>
+                </a>
+                <a class="modal-link modal-link-4" id="link-autoscout" href="#" target="_blank" rel="noopener">
+                    <span class="modal-link-icon">🔎</span>
+                    <div>
+                        <div class="modal-link-name">AutoScout24</div>
+                        <div class="modal-link-desc">La plataforma europea de vehicles de segona mà</div>
+                    </div>
+                    <span class="modal-link-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/images.js"></script>
+<script src="/static/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoEstima — {{ car.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/article.css">
+    <style>
+        .car-hero-img { width: 100%; height: 420px; object-fit: cover; border-radius: var(--radius); margin-bottom: 36px; display: block; }
+        .car-badge-cat { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+        .cat-esportiu { background: rgba(239,68,68,0.12); color: #dc2626; }
+        .cat-electric  { background: rgba(59,130,246,0.12); color: #2563eb; }
+        body.light .cat-esportiu { background: rgba(239,68,68,0.15); }
+        body.light .cat-electric  { background: rgba(59,130,246,0.15); }
+
+        .car-price-tag { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--accent); margin-bottom: 28px; }
+        body.light .car-price-tag { color: #e8440a; }
+
+        .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 32px 0; }
+        .spec-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+        .spec-box-icon { font-size: 1.5rem; margin-bottom: 6px; }
+        .spec-box-val { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+        .spec-box-lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .features-list { list-style: none; padding: 0; margin: 20px 0; }
+        .features-list li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; display: flex; align-items: center; gap: 10px; }
+        .features-list li:last-child { border-bottom: none; }
+        .features-list li::before { content: "✓"; color: var(--accent); font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+        body.light .features-list li::before { color: #e8440a; }
+
+        @media (max-width: 600px) { .specs-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">🌙</span>
+        <span id="toggle-label">Mode fosc</span>
+    </button>
+
+    <div class="container">
+        <header class="similar-header">
+            <a href="/" class="btn-back">← Tornar</a>
+            <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
+        </header>
+
+        <article class="article-wrap">
+
+            <span class="car-badge-cat cat-{{ car.category | lower | replace('è', 'e') | replace('à', 'a') }}">
+                {{ car.icon }} {{ car.category }}
+            </span>
+
+            <h1 class="article-title">{{ car.name }} <span style="font-weight:300; opacity:0.5;">{{ car.year }}</span></h1>
+
+            <p class="car-price-tag">Des de {{ car.price }}</p>
+
+            <img src="{{ car.img }}" alt="{{ car.name }}" class="car-hero-img"
+                 onerror="this.style.display='none'">
+
+            <div class="article-body">
+                <p>{{ car.desc }}</p>
+            </div>
+
+            <!-- Especificacions -->
+            <h2 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin: 32px 0 16px;">⚙️ Especificacions tècniques</h2>
+            <div class="specs-grid">
+                <div class="spec-box">
+                    <div class="spec-box-icon">🔥</div>
+                    <div class="spec-box-val">{{ car.power }}</div>
+                    <div class="spec-box-lbl">Potència</div>
+                </div>
+                <div class="spec-box">
+                    <div class="spec-box-icon">🌀</div>
+                    <div class="spec-box-val">{{ car.torque }}</div>
+                    <div class="spec-box-lbl">Parell motor</div>
+                </div>
+                <div class="spec-box">
+                    <div class="spec-box-icon">⚡</div>
+                    <div class="spec-box-val">{{ car.acceleration }}</div>
+                    <div class="spec-box-lbl">0-100 km/h</div>
+                </div>
+                <div class="spec-box">
+                    <div class="spec-box-icon">🏎️</div>
+                    <div class="spec-box-val">{{ car.top_speed }}</div>
+                    <div class="spec-box-lbl">Velocitat màxima</div>
+                </div>
+                <div class="spec-box">
+                    <div class="spec-box-icon">⚙️</div>
+                    <div class="spec-box-val">{{ car.transmission }}</div>
+                    <div class="spec-box-lbl">Canvi</div>
+                </div>
+                <div class="spec-box">
+                    <div class="spec-box-icon">🔩</div>
+                    <div class="spec-box-val">{{ car.motor }}</div>
+                    <div class="spec-box-lbl">Motor</div>
+                </div>
+            </div>
+
+            <!-- Equipament destacat -->
+            <h2 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin: 32px 0 16px;">⭐ Equipament destacat</h2>
+            <ul class="features-list">
+                {% for feature in car.features %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+
+        </article>
+
+        <footer class="footer">
+            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
+        </footer>
+    </div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

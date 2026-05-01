@@ -9,12 +9,13 @@ dist/
 build/
 .eggs/
 
-# Virtual environment
+# Virtual environments
 venv/
 .venv/
 env/
+autoestima/
 
-# Data (raw data no va al repo)
+# Data (fitxers grans, no van al repo)
 data/raw/
 data/processed/
 
