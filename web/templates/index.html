@@ -15,6 +15,17 @@
         <span id="toggle-label">Mode fosc</span>
     </button>
 
+    <!-- Navbar auth -->
+    <div class="auth-navbar">
+        {% if session.get('user_id') %}
+            <a href="/profile" class="auth-nav-btn auth-nav-profile">👤 {{ session.get('user_name', 'Perfil') }}</a>
+            <a href="/logout" class="auth-nav-btn auth-nav-logout">Sortir</a>
+        {% else %}
+            <a href="/login" class="auth-nav-btn">Inicia sessió</a>
+            <a href="/register" class="auth-nav-btn auth-nav-register">Registra't</a>
+        {% endif %}
+    </div>
+
     <div class="bg-grid"></div>
     <div class="bg-glow"></div>
 
@@ -23,7 +34,7 @@
         <!-- Header -->
         <header class="header">
             <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
-            <p class="tagline">Descobreix el valor real del teu vehicle amb Intel·ligència Artificial</p>
+            <p class="tagline">Descobreix el valor aproximat del teu futur vehicle</p>
         </header>
 
         <!-- Stats -->
@@ -41,8 +52,8 @@
                 <div class="stat-lbl">error mitjà (MAE)</div>
             </div>
             <div class="stat-card">
-                <div class="stat-num">10+</div>
-                <div class="stat-lbl">variables analitzades</div>
+                <div class="stat-num">8</div>
+                <div class="stat-lbl">variables predictores</div>
             </div>
         </div>
 
@@ -80,7 +91,7 @@
                         <select id="fuel_type" name="fuel_type" required>
                             <option value="" disabled selected>Selecciona el combustible</option>
                             {% for fuel in fuel_types %}
-                            <option value="{{ fuel }}">{{ fuel | capitalize }}</option>
+                            <option value="{{ fuel }}">{{ fuel | ca }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -89,7 +100,7 @@
                         <select id="gear_type" name="gear_type" required>
                             <option value="" disabled selected>Selecciona el canvi</option>
                             {% for gear in gear_types %}
-                            <option value="{{ gear }}">{{ gear | capitalize }}</option>
+                            <option value="{{ gear }}">{{ gear | ca }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -98,7 +109,7 @@
                         <select id="sale_type" name="sale_type" required>
                             <option value="" disabled selected>Selecciona l'estat</option>
                             {% for sale in sale_types %}
-                            <option value="{{ sale }}">{{ sale | replace('_', ' ') | capitalize }}</option>
+                            <option value="{{ sale }}">{{ sale | ca }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -340,8 +351,8 @@
                 <a class="modal-link modal-link-2" id="link-milanuncios" href="#" target="_blank" rel="noopener">
                     <span class="modal-link-icon">📋</span>
                     <div>
-                        <div class="modal-link-name">Milanuncios</div>
-                        <div class="modal-link-desc">Milers d'anuncis particulars i professionals</div>
+                        <div class="modal-link-name">Coches.net Motos</div>
+                        <div class="modal-link-desc" id="link-coches-desc">Cerca de motos de segona mà</div>
                     </div>
                     <span class="modal-link-arrow">→</span>
                 </a>

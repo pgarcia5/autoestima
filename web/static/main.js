@@ -12,6 +12,9 @@ function obrirModal(nom, preu, urlMotosnet, urlMilanuncios, urlWallapop) {
     lnkCoches.querySelector('.modal-link-icon').textContent = '🏍️';
 
     document.getElementById('link-milanuncios').href = urlMilanuncios;
+    document.getElementById('link-milanuncios').querySelector('.modal-link-icon').textContent = '🔍';
+    document.getElementById('link-milanuncios').querySelector('.modal-link-name').textContent = 'Cerca a Google';
+    document.getElementById('link-milanuncios').querySelector('.modal-link-desc').textContent = 'Resultats de Milanuncios, Vibbo i més';
     document.getElementById('link-wallapop').href = urlWallapop;
 
     // AutoScout24 per motos

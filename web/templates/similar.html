@@ -18,6 +18,16 @@
         <span id="toggle-label">Mode fosc</span>
     </button>
 
+    <div class="auth-navbar">
+        {% if session.get('user_id') %}
+            <a href="/profile" class="auth-nav-btn auth-nav-profile">👤 {{ session.get('user_name', 'Perfil') }}</a>
+            <a href="/logout" class="auth-nav-btn auth-nav-logout">Sortir</a>
+        {% else %}
+            <a href="/login" class="auth-nav-btn">Inicia sessió</a>
+            <a href="/register" class="auth-nav-btn auth-nav-register">Registra't</a>
+        {% endif %}
+    </div>
+
     <div class="container">
 
         <header class="similar-header">
@@ -30,7 +40,7 @@
                 <h2>Cotxes similars trobats</h2>
                 <p>
                     <strong>{{ make | title }}</strong> ·
-                    <strong>{{ fuel | title }}</strong> ·
+                    <strong>{{ fuel | ca }}</strong> ·
                     Preu estimat <strong>{{ "{:,}".format(predicted).replace(",", ".") }} €</strong>
                 </p>
             </div>
@@ -54,11 +64,12 @@
         <div class="cars-grid" id="cars-grid">
             {% for car in cars %}
             <div class="car-card" data-make="{{ car.make }}" data-model="{{ car.model }}">
-                <div class="car-thumb" id="thumb-{{ loop.index }}">
-                    <div class="car-img-loading">
-                        <div class="img-spinner"></div>
+                <div class="car-thumb" id="thumb-{{ loop.index }}" data-make="{{ car.make | lower }}">
+                    <div class="car-placeholder" data-make="{{ car.make | lower }}">
+                        <span class="car-placeholder-letter">{{ car.make[0].upper() }}</span>
+                        <span class="car-placeholder-make">{{ car.make | title }}</span>
                     </div>
-                    <div class="car-fuel-badge">{{ car.fuel_type | title }}</div>
+                    <div class="car-fuel-badge">{{ car.fuel_type | ca }}</div>
                 </div>
                 <div class="car-body">
                     <div class="car-title">{{ car.make | title }} {{ car.model | title }}</div>
@@ -78,13 +89,16 @@
                         </div>
                         <div class="car-spec">
                             <span class="spec-icon">🔧</span>
-                            <span>{{ car.gear_type | title }}</span>
+                            <span>{{ car.gear_type | ca }}</span>
                         </div>
                     </div>
                     <div class="car-footer">
-                        <span class="car-sale-type">{{ car.sale_type | replace('_', ' ') | title }}</span>
+                        <span class="car-sale-type">{{ car.sale_type | ca }}</span>
                         <span class="car-owners">{{ car.num_owners | int }} propietari{% if car.num_owners > 1 %}s{% endif %}</span>
                     </div>
+                    {% if session.get('user_id') %}
+                    <button class="btn-fav" onclick='afegirFavorit(this, {{ car | tojson }})'>❤️ Desar als favorits</button>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -105,5 +119,30 @@
 
     <script src="/static/main.js"></script>
     <script src="/static/images.js"></script>
+    <script>
+    async function afegirFavorit(btn, car) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Desant...';
+        try {
+            const res = await fetch('/favorite/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(car)
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = '✅ Afegit!';
+                btn.style.borderColor = '#16a34a';
+                btn.style.color = '#16a34a';
+            } else {
+                btn.textContent = '✓ Ja és favorit';
+                btn.style.opacity = '0.5';
+            }
+        } catch {
+            btn.textContent = '❌ Error';
+            btn.disabled = false;
+        }
+    }
+    </script>
 </body>
 </html>

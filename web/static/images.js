@@ -57,28 +57,33 @@ function showEmoji(thumbEl, make, badge) {
 }
 
 function setThumbImage(thumbEl, src, make) {
-    const badge = thumbEl.querySelector('.car-fuel-badge, .moto-type-badge');
-    thumbEl.innerHTML = '';
-    if (badge) thumbEl.appendChild(badge);
-
+    const badge = thumbEl.querySelector('.car-fuel-badge');
     if (src) {
         const img = document.createElement('img');
         img.src = src;
         img.alt = make;
         img.className = 'car-img';
-        img.onerror = () => { img.remove(); showEmoji(thumbEl, make, badge); };
-        thumbEl.insertBefore(img, badge);
-    } else {
-        showEmoji(thumbEl, make, badge);
+        img.style.position = 'absolute';
+        img.style.inset = '0';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.onload = () => {
+            const placeholder = thumbEl.querySelector('.car-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+            thumbEl.insertBefore(img, badge);
+        };
+        img.onerror = () => img.remove();
     }
 }
 
 function loadCarImages() {
-    const cards = document.querySelectorAll('.car-card, .moto-card');
+    // Només processa car-card — les moto-card ja tenen imatge local al HTML
+    const cards = document.querySelectorAll('.car-card');
     cards.forEach(card => {
         const make = card.dataset.make;
         const model = card.dataset.model;
-        const thumbEl = card.querySelector('.car-thumb, .moto-thumb');
+        const thumbEl = card.querySelector('.car-thumb');
         if (!thumbEl) return;
         const src = getCarImage(make, model);
         setThumbImage(thumbEl, src, make);

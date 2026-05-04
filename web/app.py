@@ -8,9 +8,49 @@ import os
 import joblib
 import pandas as pd
 import requests as req
-from flask import Flask, render_template, request, jsonify, Response
+from datetime import datetime
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import (Flask, render_template, request, jsonify,
+                   Response, session, redirect, url_for, flash)
+from models import (init_db, create_user, get_user_by_email, get_user_by_id,
+                    save_prediction, get_predictions,
+                    save_favorite, delete_favorite, get_favorites)
 
 app = Flask(__name__)
+app.secret_key = "autoestima-secret-key-2026"
+
+# Inicialitzar la base de dades
+init_db()
+
+# ── Filtres de traducció al català ────────────────────────
+
+TRANSLATIONS = {
+    # Combustible
+    "diesel":        "Dièsel",
+    "gasoline":      "Gasolina",
+    "hybrid":        "Híbrid",
+    "electric":      "Elèctric",
+    "lpg":           "GLP",
+    # Canvi
+    "manual":        "Manual",
+    "automatic":     "Automàtic",
+    "semi-automatic":"Semiautomàtic",
+    # Estat
+    "used":          "Usat",
+    "km_0":          "Km 0",
+    "almost_new":    "Quasi nou",
+    "demo":          "Demostració",
+    "new":           "Nou",
+}
+
+@app.template_filter("ca")
+def translate_ca(value):
+    """Filtre Jinja per traduir valors del dataset al català."""
+    if not value:
+        return value
+    return TRANSLATIONS.get(str(value).lower(), str(value).replace("_", " ").title())
+
 
 # Rutes relatives al directori on s'executa app.py (web/)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -45,12 +85,12 @@ MOTOS = [
 
 def moto_links(make, model):
     """Genera enllaços de cerca a plataformes de segona mà."""
-    query = f"{make} {model}".replace(" ", "+")
+    query = f"{make}+{model}+segunda+mano".replace(" ", "+")
     query_wallapop = f"{make}+{model}".replace(" ", "+")
     return {
-        "motosnet": f"https://www.motos.net/motos/segunda-mano/?q={query}",
-        "milanuncios": f"https://www.milanuncios.com/motos-de-segunda-mano/?q={query}",
-        "wallapop": f"https://es.wallapop.com/app/search?keywords={query_wallapop}&category_ids=14000",
+        "motosnet":    f"https://www.motos.net/motos/segunda-mano/?q={query_wallapop}",
+        "milanuncios": f"https://www.google.com/search?q={query}+milanuncios",
+        "wallapop":    f"https://es.wallapop.com/app/search?keywords={query_wallapop}&category_ids=14000",
     }
 
 for m in MOTOS:
@@ -237,6 +277,99 @@ NEW_CARS = [
 
 # ── Routes ────────────────────────────────────────────────
 
+def login_required(f):
+    """Decorator per protegir rutes que requereixen login."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if "user_id" in session:
+        return redirect(url_for("index"))
+    if request.method == "POST":
+        name     = request.form.get("name", "").strip()
+        email    = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm  = request.form.get("confirm", "")
+
+        if not name or not email or not password:
+            flash("Tots els camps són obligatoris.", "error")
+        elif len(password) < 6:
+            flash("La contrasenya ha de tenir almenys 6 caràcters.", "error")
+        elif password != confirm:
+            flash("Les contrasenyes no coincideixen.", "error")
+        else:
+            hashed = generate_password_hash(password)
+            if create_user(name, email, hashed):
+                flash("Compte creat correctament! Inicia sessió.", "success")
+                return redirect(url_for("login"))
+            else:
+                flash("Aquest email ja està registrat.", "error")
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if "user_id" in session:
+        return redirect(url_for("index"))
+    if request.method == "POST":
+        email    = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        user = get_user_by_email(email)
+        if user and check_password_hash(user["password"], password):
+            session["user_id"]   = user["id"]
+            session["user_name"] = user["name"]
+            flash(f"Benvingut/da, {user['name']}!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("Email o contrasenya incorrectes.", "error")
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Sessió tancada correctament.", "success")
+    return redirect(url_for("index"))
+
+
+@app.route("/profile")
+@login_required
+def profile():
+    user_id     = session["user_id"]
+    predictions = get_predictions(user_id)
+    favorites   = get_favorites(user_id)
+    user        = get_user_by_id(user_id)
+    return render_template("profile.html",
+                           user=user,
+                           predictions=predictions,
+                           favorites=favorites)
+
+
+@app.route("/favorite/add", methods=["POST"])
+def add_favorite():
+    if "user_id" not in session:
+        return jsonify({"success": False, "error": "Cal iniciar sessió"}), 401
+    car = request.get_json()
+    if not car:
+        return jsonify({"success": False, "error": "Dades invàlides"}), 400
+    result = save_favorite(session["user_id"], car)
+    return jsonify({"success": result,
+                    "msg": "Afegit als favorits!" if result else "Ja estava als favorits."})
+
+
+@app.route("/favorite/delete/<int:fav_id>", methods=["POST"])
+@login_required
+def remove_favorite(fav_id):
+    delete_favorite(session["user_id"], fav_id)
+    return redirect(url_for("profile"))
+
+
 @app.route("/")
 def index():
     return render_template(
@@ -315,13 +448,18 @@ def predict():
         def fmt(p):
             return f"{int(p):,}".replace(",", ".") + " €"
 
+        # Guardar a l'historial si l'usuari està logat
+        if "user_id" in session:
+            save_prediction(session["user_id"], data,
+                            int(prediction), int(price_low), int(price_high))
+
         return jsonify({
-            "success":       True,
-            "price":         int(prediction),
+            "success":        True,
+            "price":          int(prediction),
             "price_formatted": fmt(prediction),
-            "price_low":     fmt(price_low),
-            "price_high":    fmt(price_high),
-            "price_low_raw": int(price_low),
+            "price_low":      fmt(price_low),
+            "price_high":     fmt(price_high),
+            "price_low_raw":  int(price_low),
             "price_high_raw": int(price_high),
         })
 

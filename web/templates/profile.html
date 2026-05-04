@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoEstima — El meu perfil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .profile-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+        .profile-info { display: flex; align-items: center; gap: 16px; }
+        .profile-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .profile-name { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+        .profile-email { font-size: 0.85rem; color: var(--muted); }
+        .btn-logout { padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); font-family: var(--font-body); font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: border-color 0.2s, color 0.2s; }
+        .btn-logout:hover { border-color: #dc2626; color: #dc2626; }
+
+        .profile-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-family: var(--font-body); font-size: 0.95rem; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.2s, border-color 0.2s; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Historial */
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+        .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .history-left { display: flex; flex-direction: column; gap: 4px; }
+        .history-make { font-weight: 700; font-size: 1rem; text-transform: capitalize; }
+        .history-details { font-size: 0.8rem; color: var(--muted); }
+        .history-right { text-align: right; }
+        .history-price { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+        body.light .history-price { color: #e8440a; }
+        .history-range { font-size: 0.75rem; color: var(--muted); }
+        .history-date { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+        /* Favorits */
+        .favorites-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .fav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; position: relative; }
+        .fav-make { font-weight: 700; font-size: 0.95rem; text-transform: capitalize; margin-bottom: 2px; }
+        .fav-model { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; text-transform: capitalize; }
+        .fav-price { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+        body.light .fav-price { color: #e8440a; }
+        .fav-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.75rem; color: var(--muted); }
+        .fav-delete { position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; font-size: 0.85rem; color: var(--muted); padding: 4px 6px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
+        .fav-delete:hover { color: #dc2626; background: rgba(239,68,68,0.1); }
+        .fav-date { font-size: 0.7rem; color: var(--muted); margin-top: 10px; }
+
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+        .empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .empty-state-text { font-size: 0.95rem; }
+        .empty-state a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 600px) { .favorites-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="toggle-icon" id="toggle-icon">🌙</span>
+        <span id="toggle-label">Mode fosc</span>
+    </button>
+
+    <div class="container">
+        <header class="similar-header">
+            <a href="/" class="btn-back">← Tornar</a>
+            <div class="logo">🚗 Auto<span class="accent">Estima</span></div>
+        </header>
+
+        <!-- Capçalera del perfil -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-avatar">{{ user['name'][0].upper() }}</div>
+                <div>
+                    <div class="profile-name">{{ user['name'] }}</div>
+                    <div class="profile-email">{{ user['email'] }}</div>
+                </div>
+            </div>
+            <a href="/logout" class="btn-logout">Tancar sessió</a>
+        </div>
+
+        <!-- Tabs -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" onclick="switchTab('history', this)">
+                🕒 Historial de prediccions
+                <span style="background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:0.72rem;margin-left:6px;">{{ predictions|length }}</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('favorites', this)">
+                ❤️ Vehicles favorits
+                <span style="background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:0.72rem;margin-left:6px;">{{ favorites|length }}</span>
+            </button>
+        </div>
+
+        <!-- Historial -->
+        <div class="tab-content active" id="tab-history">
+            {% if predictions %}
+            <div class="history-list">
+                {% for p in predictions %}
+                <div class="history-item">
+                    <div class="history-left">
+                        <div class="history-make">{{ p.make.title() }}</div>
+                        <div class="history-details">
+                            {{ p.fuel_type | ca }} · {{ p.gear_type | ca }} · {{ p.sale_type | ca }}
+                            · {{ p.months_old }} mesos · {{ "{:,}".format(p.kms).replace(",",".") }} km · {{ p.power }} CV
+                        </div>
+                        <div class="history-date">{{ p.created[:16].replace('T', ' a les ') }}</div>
+                    </div>
+                    <div class="history-right">
+                        <div class="history-price">{{ "{:,}".format(p.price).replace(",",".") }} €</div>
+                        <div class="history-range">{{ "{:,}".format(p.price_low).replace(",",".") }} € — {{ "{:,}".format(p.price_high).replace(",",".") }} €</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🔮</div>
+                <div class="empty-state-text">Encara no has fet cap predicció.<br><a href="/">Fes la teva primera predicció</a></div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Favorits -->
+        <div class="tab-content" id="tab-favorites">
+            {% if favorites %}
+            <div class="favorites-grid">
+                {% for f in favorites %}
+                <div class="fav-card">
+                    <form method="POST" action="/favorite/delete/{{ f.id }}" style="display:inline;">
+                        <button class="fav-delete" title="Eliminar de favorits">✕</button>
+                    </form>
+                    <div class="fav-make">{{ f.make.title() }}</div>
+                    <div class="fav-model">{{ f.model.title() if f.model else '—' }}</div>
+                    <div class="fav-price">{{ "{:,}".format(f.price).replace(",",".") }} €</div>
+                    <div class="fav-specs">
+                        <span>🛣️ {{ "{:,}".format(f.kms).replace(",",".") }} km</span>
+                        <span>⚡ {{ f.power }} CV</span>
+                        <span>📅 {{ f.months_old }} mesos</span>
+                        <span>⛽ {{ f.fuel_type | ca }}</span>
+                    </div>
+                    <div class="fav-date">Afegit el {{ f.created[:10] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">❤️</div>
+                <div class="empty-state-text">Encara no tens vehicles favorits.<br><a href="/">Cerca cotxes similars</a> i afegeix-ne als favorits</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <footer class="footer">
+            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
+        </footer>
+    </div>
+
+    <script src="/static/main.js"></script>
+    <script>
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            btn.classList.add('active');
+        }
+    </script>
+</body>
+</html>

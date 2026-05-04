@@ -50,6 +50,44 @@ body.light .car-card:hover { border-color: rgba(232,68,10,0.3); }
     transition: transform 0.3s;
 }
 .car-card:hover .car-img { transform: scale(1.05); }
+
+/* Placeholder elegant per marca */
+.car-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+}
+.car-placeholder-letter {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+    color: #fff; background: var(--placeholder-color, #888);
+}
+.car-placeholder-make { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Colors per marca — s'aplica a car-placeholder-letter via CSS variable */
+[data-make="volkswagen"] .car-placeholder-letter { background: #1b3a6b; }
+[data-make="audi"]       .car-placeholder-letter { background: #bb0a1e; }
+[data-make="bmw"]        .car-placeholder-letter { background: #0066b1; }
+[data-make="mercedes-benz"] .car-placeholder-letter { background: #333; }
+[data-make="seat"]       .car-placeholder-letter { background: #e8440a; }
+[data-make="ford"]       .car-placeholder-letter { background: #003478; }
+[data-make="renault"]    .car-placeholder-letter { background: #f1c400; }
+[data-make="peugeot"]    .car-placeholder-letter { background: #003189; }
+[data-make="opel"]       .car-placeholder-letter { background: #e2000f; }
+[data-make="citroen"]    .car-placeholder-letter { background: #8b0000; }
+[data-make="toyota"]     .car-placeholder-letter { background: #eb0a1e; }
+[data-make="honda"]      .car-placeholder-letter { background: #cc0000; }
+[data-make="nissan"]     .car-placeholder-letter { background: #c3002f; }
+[data-make="hyundai"]    .car-placeholder-letter { background: #002c5f; }
+[data-make="kia"]        .car-placeholder-letter { background: #05141f; }
+[data-make="skoda"]      .car-placeholder-letter { background: #4ba82e; }
+[data-make="dacia"]      .car-placeholder-letter { background: #005c9e; }
+[data-make="fiat"]       .car-placeholder-letter { background: #c00; }
+[data-make="mini"]       .car-placeholder-letter { background: #111; }
+[data-make="tesla"]      .car-placeholder-letter { background: #e82127; }
+[data-make="volvo"]      .car-placeholder-letter { background: #003057; }
+[data-make="mazda"]      .car-placeholder-letter { background: #c00; }
 .car-emoji { font-size: 3rem; }
 .car-img-loading {
     display: flex; align-items: center; justify-content: center;
