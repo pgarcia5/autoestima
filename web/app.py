@@ -13,9 +13,9 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import (Flask, render_template, request, jsonify,
                    Response, session, redirect, url_for, flash)
-from models import (init_db, create_user, get_user_by_email, get_user_by_id,
-                    save_prediction, get_predictions,
-                    save_favorite, delete_favorite, get_favorites)
+from web.models import (init_db, create_user, get_user_by_email, get_user_by_id,
+                        save_prediction, get_predictions,
+                        save_favorite, delete_favorite, get_favorites)
 
 app = Flask(__name__)
 app.secret_key = "autoestima-secret-key-2026"
