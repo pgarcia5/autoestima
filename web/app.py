@@ -23,6 +23,79 @@ app.secret_key = "autoestima-secret-key-2026"
 # Inicialitzar la base de dades
 init_db()
 
+# ── NewsAPI ───────────────────────────────────────────────
+NEWS_API_KEY  = os.environ.get("NEWS_API_KEY", "c6d3a1e5da6f4437aee961fab6aa19c7")
+NEWS_CACHE    = {"data": None, "timestamp": None}
+
+def fetch_news_api():
+    """Obté les últimes notícies d'automòbils via NewsAPI. Cache d'1 hora."""
+    global NEWS_CACHE
+    if NEWS_CACHE["data"] and NEWS_CACHE["timestamp"]:
+        if (datetime.now() - NEWS_CACHE["timestamp"]).seconds < 3600:
+            return NEWS_CACHE["data"]
+    try:
+        r = req.get("https://newsapi.org/v2/everything", params={
+            "q": "coches AND (electrico OR hibrido OR matriculaciones OR segunda mano OR automocion OR conducir)",
+            "language": "es",
+            "sortBy": "publishedAt",
+            "pageSize": 20,
+            "apiKey": NEWS_API_KEY,
+        }, timeout=5)
+
+        MOTOR_KEYWORDS = [
+            "coche", "carro", "vehiculo", "vehículo", "motor", "electrico", "eléctrico",
+            "hibrido", "híbrido", "conducir", "automocion", "automoción",
+            "matriculacion", "segunda mano", "formula", "rally", "bmw", "audi",
+            "seat", "volkswagen", "renault", "toyota", "honda", "bateria", "batería",
+            "gasolina", "diesel", "diésel", "autopista", "kilometros", "kilómetros",
+            "concesionario", "autonomia", "autonomía", "recarga", "combustible"
+        ]
+        BLACKLIST = [
+            "bombero", "incendio", "homicidio", "crimen", "asesinato", "accidente mortal",
+            "detenido", "arrestado", "preso", "condena", "juicio", "tribunal",
+            "enfermedad", "hospital", "cancer", "político", "elecciones", "guerra",
+            "zebre", "animal", "premio simone", "cultura", "música", "cine", "deporte"
+        ]
+
+        all_articles = r.json().get("articles", [])
+        articles = []
+        for a in all_articles:
+            text = ((a.get("title") or "") + " " + (a.get("description") or "")).lower()
+            # Descartar si conté paraules de la llista negra
+            if any(bw in text for bw in BLACKLIST):
+                continue
+            # Acceptar si conté paraules de motor
+            if any(kw in text for kw in MOTOR_KEYWORDS):
+                articles.append(a)
+            if len(articles) == 4:
+                break
+
+        if not articles:
+            return None
+        colors = ["green", "blue", "orange", "purple"]
+        news = []
+        for i, a in enumerate(articles):
+            news.append({
+                "id":       i + 1,
+                "category": "Notícia",
+                "image":    a.get("urlToImage") or f"/static/img/noticia{i+1}.jpg",
+                "title":    (a.get("title") or "")[:80],
+                "desc":     (a.get("description") or "")[:120],
+                "date":     (a.get("publishedAt") or "")[:10],
+                "color":    colors[i],
+                "url":      a.get("url", "#"),
+                "body":     [
+                    a.get("description") or "",
+                    a.get("content") or ""
+                ]
+            })
+        NEWS_CACHE = {"data": news, "timestamp": datetime.now()}
+        return news
+    except Exception as e:
+        print(f"NewsAPI error: {e}")
+        return None
+
+
 # ── Filtres de traducció al català ────────────────────────
 
 TRANSLATIONS = {
@@ -378,7 +451,7 @@ def index():
         fuel_types=FUEL_TYPES,
         gear_types=GEAR_TYPES,
         sale_types=SALE_TYPES,
-        news=NEWS,
+        news=fetch_news_api() or NEWS,
         new_cars=NEW_CARS,
         motos=MOTOS,
     )
@@ -394,7 +467,8 @@ def cotxe(car_id):
 
 @app.route("/article/<int:article_id>")
 def article(article_id):
-    art = next((n for n in NEWS if n["id"] == article_id), None)
+    active_news = fetch_news_api() or NEWS
+    art = next((n for n in active_news if n["id"] == article_id), None)
     if not art:
         return "Article no trobat", 404
     return render_template("article.html", article=art)

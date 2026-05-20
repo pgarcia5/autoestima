@@ -78,7 +78,7 @@
             <form id="predict-form" class="form">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="make">Marca</label>
+                        <label for="make">Marca <span class="required">*</span></label>
                         <select id="make" name="make" required>
                             <option value="" disabled selected>Selecciona la marca</option>
                             {% for make in makes %}
@@ -87,7 +87,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="fuel_type">Combustible</label>
+                        <label for="fuel_type">Combustible <span class="required">*</span></label>
                         <select id="fuel_type" name="fuel_type" required>
                             <option value="" disabled selected>Selecciona el combustible</option>
                             {% for fuel in fuel_types %}
@@ -96,7 +96,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="gear_type">Tipus de canvi</label>
+                        <label for="gear_type">Tipus de canvi <span class="required">*</span></label>
                         <select id="gear_type" name="gear_type" required>
                             <option value="" disabled selected>Selecciona el canvi</option>
                             {% for gear in gear_types %}
@@ -105,7 +105,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="sale_type">Estat del vehicle</label>
+                        <label for="sale_type">Estat del vehicle <span class="required">*</span></label>
                         <select id="sale_type" name="sale_type" required>
                             <option value="" disabled selected>Selecciona l'estat</option>
                             {% for sale in sale_types %}
@@ -114,20 +114,20 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="months_old">Antiguitat (mesos)</label>
-                        <input type="number" id="months_old" name="months_old" placeholder="Ex: 36" min="0" max="600" required>
+                        <label for="months_old">Antiguitat (mesos) <span class="optional">Opcional</span></label>
+                        <input type="number" id="months_old" name="months_old" placeholder="Ex: 36 (per defecte)" min="0" max="600">
                     </div>
                     <div class="form-group">
-                        <label for="power">Potència (CV)</label>
-                        <input type="number" id="power" name="power" placeholder="Ex: 120" min="50" max="1000" required>
+                        <label for="power">Potència (CV) <span class="optional">Opcional</span></label>
+                        <input type="number" id="power" name="power" placeholder="Ex: 120 (per defecte)" min="50" max="1000">
                     </div>
                     <div class="form-group">
-                        <label for="kms">Quilometratge (km)</label>
-                        <input type="number" id="kms" name="kms" placeholder="Ex: 85000" min="0" max="600000" required>
+                        <label for="kms">Quilometratge (km) <span class="optional">Opcional</span></label>
+                        <input type="number" id="kms" name="kms" placeholder="Ex: 85000 (per defecte)" min="0" max="600000">
                     </div>
                     <div class="form-group">
-                        <label for="num_owners">Nombre de propietaris</label>
-                        <input type="number" id="num_owners" name="num_owners" placeholder="Ex: 1" min="1" max="10" required>
+                        <label for="num_owners">Nombre de propietaris <span class="optional">Opcional</span></label>
+                        <input type="number" id="num_owners" name="num_owners" placeholder="Ex: 1 (per defecte)" min="1" max="10">
                     </div>
                 </div>
 
@@ -323,12 +323,6 @@
                 {% endfor %}
             </div>
         </section>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>AutoEstima · Projecte Final IA & Big Data · Model: Random Forest · R² = 0.901</p>
-        </footer>
-
     </div>
 
     <!-- Modal on trobar (motos i cotxes per pressupost) -->

@@ -97,7 +97,8 @@ body.light .badge { background: rgba(232,68,10,0.1); color: #e8440a; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 28px; }
 .form-group { display: flex; flex-direction: column; gap: 7px; }
 .form-group label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.form-group input, .form-group select {
+.required { color: #e8440a; font-weight: 700; margin-left: 2px; }
+.optional { color: var(--muted); font-size: 0.7rem; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }.form-group input, .form-group select {
     background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
     padding: 13px 14px; color: var(--text); font-family: var(--font-body); font-size: 0.92rem;
     outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none; cursor: pointer;

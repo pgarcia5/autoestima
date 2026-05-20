@@ -176,6 +176,13 @@ if (predictForm) {
 
     try {
         const formData = new FormData(e.target);
+
+        // Valors per defecte per als camps opcionals
+        if (!formData.get('months_old') || formData.get('months_old') === '') formData.set('months_old', '36');
+        if (!formData.get('power')      || formData.get('power') === '')      formData.set('power', '110');
+        if (!formData.get('kms')        || formData.get('kms') === '')        formData.set('kms', '50000');
+        if (!formData.get('num_owners') || formData.get('num_owners') === '') formData.set('num_owners', '1');
+
         const response = await fetch('/predict', { method: 'POST', body: formData });
         const data = await response.json();
 
